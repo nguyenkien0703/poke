@@ -1,26 +1,48 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png" />
-  <HelloWorld msg="Welcome to Your Vue.js App" />
+  <main-screen
+    v-if="statusMatch === 'default'"
+    @onStart="onHandleBeforeStart($event)"
+  />
+  <interact-sreen
+    v-if="statusMatch === 'match'"
+    :cardsContext="settings.cardsContext"
+  />
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld.vue";
-
+import MainScreen from "./components/MainScreen.vue";
+import InteractSreen from "./components/InteractSreen.vue";
+import { shuffed } from "./utils/array";
 export default {
   name: "App",
+  data() {
+    return {
+      settings: {
+        totalBlocks: 0,
+        cardsContext: [],
+        startedAt: null,
+      },
+      statusMatch: "default",
+    };
+  },
   components: {
-    HelloWorld,
+    MainScreen,
+    InteractSreen,
+  },
+  methods: {
+    onHandleBeforeStart(config) {
+      this.settings.totalBlocks = config.totalBlocks;
+      const firstCards = Array.from(
+        { length: this.settings.totalBlocks / 2 },
+        (_, i) => i + 1
+      );
+      const secondCards = [...firstCards];
+      const cards = [...secondCards, ...firstCards];
+      this.settings.cardsContext = shuffed(shuffed(shuffed(shuffed(cards))));
+      this.settings.startedAt = new Date().getTime();
+      // data ready
+      this.statusMatch = "match";
+    },
   },
 };
 </script>
-
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
